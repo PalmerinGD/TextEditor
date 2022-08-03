@@ -1,16 +1,16 @@
 /*
     Author: Diego Palmerin
 */
-#include "terminal.h"
+#include "systemopt.h"
 
-void getWinSize(struct winsize * ws) {
-    if(ioctl(STDOUT_FILENO, TIOCGWINSZ, ws) == -1) {
+static void getWinSize(struct systemopt * sy) {
+    if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &sy->ws) == -1) {
         printf("getWinSize");
         exit(1);
     }
 }
 
-void getCursorPosition(struct editor * e) {
+void getCursorPosition(struct systemopt * sy) {
     //Prints current position of cursor
     if(write(STDOUT_FILENO, "\x1b[6n", 4) != 4) {
         printf("getCursorTerminal");
@@ -32,14 +32,14 @@ void getCursorPosition(struct editor * e) {
     if(buff[0] != '\x1b' || buff[1] != '[') {
         exit(1);
     }
-    sscanf(&buff[2], "%d;%d", &e->row, &e->col);
+    sscanf(&buff[2], "%d;%d", &sy->row, &sy->col);
 }
 /*
     Disables terminal and sets the terminal to its original state
 */
-void finishEditor(struct editor * e) {
+void finishEditor(struct systemopt * sy) {
 
-    if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &e->terminalConfig) == ERROR) {
+    if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &sy->terminal) == ERROR) {
         printf("finishTerminal");
         exit(1);
     }
@@ -48,12 +48,12 @@ void finishEditor(struct editor * e) {
 /*
     Initiates terminal in raw mode(Noncanonical mode)
 */
-void initEditor(struct editor * e) {
-    if(tcgetattr(STDIN_FILENO, &e->terminalConfig) == ERROR) {
+void initEditor(struct systemopt * sy) {
+    if(tcgetattr(STDIN_FILENO, &sy->terminal) == ERROR) {
         printf("InitTerminal");
         exit(1);
     }
-    struct termios rawTerminal = e->terminalConfig;
+    struct termios rawTerminal = sy->terminal;
 
     rawTerminal.c_lflag &= ~(ICANON | ISIG | IEXTEN | ECHO);
 
@@ -69,7 +69,7 @@ void initEditor(struct editor * e) {
         printf("InitTerminal");
         exit(1);
     }
-    getWinSize(&e->ws);
+    getWinSize(sy);
 
 }
 
