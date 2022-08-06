@@ -23,7 +23,8 @@ struct cnode * cnodeParent(struct cnode * cn);
 void initcnodeList(struct cnodeList * clist);
 
 int addcnode(struct cnodeList * clist, char c);
-int getTotalcnodes(struct cnode * cn);
+int getTotalcnodesAfter(struct cnode * cn);
+int getTotalcnodesBefore(struct cnode * cn);
 int movecnode(struct cnodeList * clist, int n);
 int printcnodeList(int fd, struct cnodeList * clist);
 

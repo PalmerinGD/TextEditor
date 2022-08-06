@@ -7,3 +7,4 @@ enum arrows {
 };
 
 void refreshScreen();
+void moveCursor();

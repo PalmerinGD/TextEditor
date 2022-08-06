@@ -10,3 +10,12 @@ void refreshScreen() {
         exit(1);
     }
 }
+
+void moveCursor(int row, int col) {
+    char pos[20];
+    int temp = sprintf(pos, "\x1b[%d;%dH", row, col);
+    if(write(STDOUT_FILENO, pos, temp) != temp) {
+        printf("moveCursor");
+        exit(1);
+    }
+}

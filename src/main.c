@@ -13,9 +13,6 @@
 #define IS_RUNNING 1
 #define CTRL_KEY(k) ((k & 0x1f))
 
-void moveCursor() {
-}
-
 int main() {
     struct systemopt sy;
     sy.row = 1;
@@ -29,11 +26,7 @@ int main() {
     while(IS_RUNNING) {
         refreshScreen();
         printcnodeList(STDOUT_FILENO, &clist);
-
-        char pos[20];
-        int temp = sprintf(pos, "\x1b[%d;%dH", sy.row, sy.col);
-        if(write(STDOUT_FILENO, pos, temp) != temp) exit(1);
-
+        moveCursor(sy.row, sy.col);
         if(read(STDIN_FILENO, &key, 1) == -1) break;
         if(key == CTRL_KEY('q')) break;
         else if(key == ENTER) {
@@ -48,18 +41,26 @@ int main() {
             if(read(STDIN_FILENO, buffer, 2) == -1) break;
             if(buffer[0] != '[') continue;
             else if(buffer[1] == 'A') {
-                struct cnode * parent = cnodeParent(clist.currentcnode);
-                struct cnode * grand = cnodeParent(parent);
-                if(grand != NULL) {
-                    clist.currentcnode = grand;
-                    int totalc = getTotalcnodes(parent);
-                    int totalp = getTotalcnodes(grand);
+                if(clist.currentcnode->c == 0) {
+                    struct cnode * parent = cnodeParent(clist.currentcnode);
+                    clist.currentcnode = parent;
+                    sy.col = 1;
                     --sy.row;
-                    if(totalc > totalp) {
-                        movecnode(&clist, totalp);
-                        sy.col -= totalc - totalp;
+                }
+                else {
+                    struct cnode * parent = cnodeParent(clist.currentcnode);
+                    struct cnode * grand = cnodeParent(parent);
+                    if(grand != NULL) {
+                        int totalc = getTotalcnodesBefore(clist.currentcnode);
+                        int totalp = getTotalcnodesAfter(grand);
+                        clist.currentcnode = grand;
+                        --sy.row;
+                        if(totalc > totalp) {
+                            movecnode(&clist, totalp);
+                            sy.col = totalp + 1;
+                        }
+                        else movecnode(&clist, totalc);
                     }
-                    else movecnode(&clist, totalc);
                 }
             }
             else if(buffer[1] == 'B') break;

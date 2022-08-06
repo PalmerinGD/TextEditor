@@ -40,13 +40,22 @@ int printcnodeList(int fd, struct cnodeList * clist) {
     return 0;
 }
 
-int getTotalcnodes(struct cnode * cn) {
+int getTotalcnodesAfter(struct cnode * cn) {
     int total = 0;
     int cnt = 0;
     while(cn != NULL && cnt <= 1) {
         if(cn->c == 0) cnt++;
         else if(cn->c != '\r' && cn->c != '\n') total++;
         cn = cn->next;
+    }
+    return total;
+}
+
+int getTotalcnodesBefore(struct cnode * cn) {
+    int total = 0;
+    while(cn != NULL && cn->c != 0) {
+        if(cn->c != '\r' && cn->c != '\n') total++;
+        cn = cn->prev;
     }
     return total;
 }
@@ -63,5 +72,3 @@ int movecnode(struct cnodeList * clist, int n) {
     }
     return 0;
 }
-
-
