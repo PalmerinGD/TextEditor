@@ -3,24 +3,23 @@
  *
  * */
 
+/*** Includes ***/
 #include <termios.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+
+/*** Defines ***/
 #define ERROR -1
 
+/*** Structs ***/
 struct systemopt {
     struct termios terminal;
     struct winsize ws;
-    int row;
-    int col;
 };
 
-/* Private Functions */
-static void getWinSize(struct systemopt * sy);
-
-/* Public Functions */
-void initEditor(struct systemopt * sy);
-void finishEditor(struct systemopt * sy);
-void getCursorPosition(struct systemopt * sy);
+/*** Functions ***/
+void initSystemOpt(struct systemopt * sy);
+void finishSystemOpt(struct systemopt * sy);
+void getWinSize(struct systemopt * sy);
